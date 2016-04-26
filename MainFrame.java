@@ -6,6 +6,15 @@ import java.net.*;
 
 class MainFrame extends JFrame
 {
+	static JFrame window;
+	static JPanel mainPanel = new JPanel();	//Puts Grid Panels into One Panel
+	static JPanel topBoard = new JPanel();		//Stores top grid in a square
+	static JPanel bottomBoard = new JPanel();	//Stores Bottom Grid in a square
+	static JPanel commandPanel = new JPanel();	//Makes Panel on side where commands will show
+	static JPanel titlePanel = new JPanel();
+	static JLabel directions;
+	static String commandPanelText;
+
 	public MainFrame()
 	{
 		super("***BATTLESHIP***");
@@ -16,22 +25,25 @@ class MainFrame extends JFrame
 	public static void main(String[] args) throws Exception
 	{
 		// Game Setup
-		MainFrame window = new MainFrame();
-		window.setSize(800,700);
+		SetupBoard();
+		ConnectToServer();
+	}
 
-		JPanel topBoard = new JPanel();		//Stores top grid in a square
+	public static void SetupBoard()
+	{
+		window = new MainFrame();
+		window.setSize(1000,700);
 		topBoard.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
-
-		JPanel bottomBoard = new JPanel();	//Stores Bottom Grid in a square
 		bottomBoard.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
-
-		JPanel commandPanel = new JPanel();	//Makes Panel on side where commands will show
 		commandPanel.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
-		String commandPanelText = "****** This is the Command Panel ******";
-		JLabel cP = new JLabel(commandPanelText, JLabel.CENTER);
-		commandPanel.add(cP);
+		commandPanel.setLayout(new BorderLayout(0,0));
 
-		JPanel titlePanel = new JPanel();
+		JLabel cP = new JLabel("****** This is the Command Panel ******", JLabel.CENTER);
+		directions = new JLabel("", JLabel.CENTER);
+
+		commandPanel.add(cP, BorderLayout.NORTH);
+		commandPanel.add(directions, BorderLayout.CENTER);
+
 		JLabel title = new JLabel("WELCOME TO BATTLESHIP!", JLabel.CENTER);
 		titlePanel.add(title);
 
@@ -55,7 +67,10 @@ class MainFrame extends JFrame
 		window.add(commandPanel, BorderLayout.EAST);
 		window.add(mainPanel, BorderLayout.CENTER);
 		window.setVisible(true);
+	}
 
+	public static void ConnectToServer() throws Exception
+	{
 		// Networking
 		boolean talk = false;
 		int state = 0;
@@ -73,21 +88,18 @@ class MainFrame extends JFrame
 		DatagramPacket receivePacket = null;
 		String receivedMessge;
 
-		while (state < 3){
+		while (state < 3)
+		{
 			sendData = new byte[1024];
 			receiveData = new byte[1024];
-			switch (state){
+			switch (state)
+			{
 				case 0:
 					// send initial message to server and wait for response
 					sendData = message.getBytes();
 					sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,9876);
 					clientSocket.send(sendPacket);
-
-					commandPanel.remove(cP);
-					commandPanelText = "\nAttempting to connect to server.";
-					cP = new JLabel(commandPanelText, JLabel.CENTER);
-					commandPanel.add(cP);
-            		window.revalidate();
+					
 
 
 					receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -95,24 +107,26 @@ class MainFrame extends JFrame
 					response = new String(receivePacket.getData());
           			response = response.trim();
 
-          			//System.out.println(response); //either 100 or 200
-
-					if (response.substring(0,3).equals("100")) {
+					if (response.substring(0,3).equals("100")) 
+					{
 						state = 1; //You are first client. wait for second client to connect
-						commandPanel.remove(cP);
-            			commandPanelText = "\nYou are the first to\n connect to the server.";
-            			cP = new JLabel(commandPanelText, JLabel.CENTER);
+
+            			System.out.println("You are the first to connect to the server.");
+            			System.out.println("Waiting for Secong Player");
+            			commandPanelText = "Waiting for Second Player";
+            			directions.setText(commandPanelText);
             			talk = true;
-            			commandPanel.add(cP);
             			window.revalidate();
 					}
 
-					else if (response.substring(0,3).equals("200")) {
+					else if (response.substring(0,3).equals("200")) 
+					{
 						state = 2; //you are second client. Wait for message from first client
-						commandPanel.remove(cP);
-						commandPanelText = "\nYou are the second to\n connect to the server.";
-            			cP = new JLabel(commandPanelText, JLabel.CENTER);
-            			commandPanel.add(cP);
+						
+						commandPanelText = "Welcome Second Player";
+						System.out.println("You were the second to connect to the sever.");
+
+            			directions.setText(commandPanelText);
             			window.revalidate();
 					}
 
@@ -131,11 +145,10 @@ class MainFrame extends JFrame
 					if (response.substring(0,3).equals("200")) 
 					{
 						//get message from user and send it to server
-						commandPanel.remove(cP);
-						commandPanelText = "\nAnother player has connected";
-            			cP = new JLabel(commandPanelText, JLabel.CENTER);
+						
+						commandPanelText = "Another player has connected";
+            			directions.setText(commandPanelText);
            				state = 2;
-           				commandPanel.add(cP);
            				window.revalidate();
 					}
 
