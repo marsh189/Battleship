@@ -20,6 +20,7 @@ class MyButton extends JButton {
             setPressedBackgroundColor(Color.GREEN);
         }
 
+        //Paints button to specified color on hover and on click
         @Override
         protected void paintComponent(Graphics g) 
         {

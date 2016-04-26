@@ -6,6 +6,7 @@ class GridPanel extends JPanel
 {
 	public JButton[][] btnArr = new JButton[10][10];
 
+	//Makes Grid of 100 buttons in a JPanels
 	public GridPanel(int x, int y)
 	{
 		setLayout(new GridLayout(x,y,2,2));

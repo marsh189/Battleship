@@ -11,9 +11,10 @@ class MainFrame extends JFrame
 	static JPanel topBoard = new JPanel();		//Stores top grid in a square
 	static JPanel bottomBoard = new JPanel();	//Stores Bottom Grid in a square
 	static JPanel commandPanel = new JPanel();	//Makes Panel on side where commands will show
-	static JPanel titlePanel = new JPanel();
-	static JLabel directions;
-	static String commandPanelText;
+	static JLabel directions;					//Tells what the player must do/ What is going on
+	static String commandPanelText;	
+
+	final static JPanel titlePanel = new JPanel();	//title of Game is stored here		
 
 	public MainFrame()
 	{
@@ -24,11 +25,12 @@ class MainFrame extends JFrame
 
 	public static void main(String[] args) throws Exception
 	{
-		// Game Setup
 		SetupBoard();
+		PlaceShips();
 		ConnectToServer();
 	}
 
+	//Sets up the beginning look of the board
 	public static void SetupBoard()
 	{
 		window = new MainFrame();
@@ -69,129 +71,116 @@ class MainFrame extends JFrame
 		window.setVisible(true);
 	}
 
-	public static void ConnectToServer() throws Exception
+	//Player will place their ship pieces on board
+	public static void PlaceShips()
 	{
-		// Networking
-		boolean talk = false;
-		int state = 0;
-		String response="";
 
-		DatagramSocket clientSocket = new DatagramSocket();
- 		InetAddress IPAddress = InetAddress.getByName("localhost");
+	}
 
- 		String message = "HELLO SERVER";
- 		byte[] sendData = new byte[1024];
- 		sendData = message.getBytes();
-		DatagramPacket sendPacket=null;
-
- 		byte[] receiveData = new byte[1024];
-		DatagramPacket receivePacket = null;
-		String receivedMessge;
-
-		while (state < 3)
+	//Connects the client to the server
+	public static void ConnectToServer()
+	{
+		try
 		{
-			sendData = new byte[1024];
-			receiveData = new byte[1024];
-			switch (state)
+			// Networking
+			boolean talk = false;
+			int state = 0;
+			String response="";
+
+			DatagramSocket clientSocket = new DatagramSocket();
+	 		InetAddress IPAddress = InetAddress.getByName("localhost");
+
+	 		String message = "HELLO SERVER";
+	 		byte[] sendData = new byte[1024];
+	 		sendData = message.getBytes();
+			DatagramPacket sendPacket=null;
+
+	 		byte[] receiveData = new byte[1024];
+			DatagramPacket receivePacket = null;
+			String receivedMessge;
+
+			while (state < 3)
 			{
-				case 0:
-					// send initial message to server and wait for response
-					sendData = message.getBytes();
-					sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,9876);
-					clientSocket.send(sendPacket);
-					
-
-
-					receivePacket = new DatagramPacket(receiveData, receiveData.length);
-					clientSocket.receive(receivePacket);
-					response = new String(receivePacket.getData());
-          			response = response.trim();
-
-					if (response.substring(0,3).equals("100")) 
-					{
-						state = 1; //You are first client. wait for second client to connect
-
-            			System.out.println("You are the first to connect to the server.");
-            			System.out.println("Waiting for Secong Player");
-            			commandPanelText = "Waiting for Second Player";
-            			directions.setText(commandPanelText);
-            			talk = true;
-            			window.revalidate();
-					}
-
-					else if (response.substring(0,3).equals("200")) 
-					{
-						state = 2; //you are second client. Wait for message from first client
+				sendData = new byte[1024];
+				receiveData = new byte[1024];
+				switch (state)
+				{
+					case 0:
+						// send initial message to server and wait for response
+						sendData = message.getBytes();
+						sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,9876);
+						clientSocket.send(sendPacket);
 						
-						commandPanelText = "Welcome Second Player";
-						System.out.println("You were the second to connect to the sever.");
 
-            			directions.setText(commandPanelText);
-            			window.revalidate();
-					}
 
-					break;
+						receivePacket = new DatagramPacket(receiveData, receiveData.length);
+						clientSocket.receive(receivePacket);
+						response = new String(receivePacket.getData());
+	          			response = response.trim();
 
-				case 1:
+						if (response.substring(0,3).equals("100")) 
+						{
+							state = 1; //You are first client. wait for second client to connect
 
-					// Waiting for notification that the second client is ready
-					receivePacket = new DatagramPacket(receiveData, receiveData.length);
-					clientSocket.receive(receivePacket);
-					response = new String(receivePacket.getData());
-          			response = response.trim();
+	            			System.out.println("You are the first to connect to the server.");
+	            			System.out.println("Waiting for Secong Player");
+	            			commandPanelText = "Waiting for Second Player";
+	            			directions.setText(commandPanelText);
+	            			talk = true;
+	            			window.revalidate();
+						}
 
-          			//System.out.println(response); // prints either 100 or 200
+						else if (response.substring(0,3).equals("200")) 
+						{
+							state = 2; //you are second client. Wait for message from first client
+							
+							commandPanelText = "Welcome Second Player";
+							System.out.println("You were the second to connect to the sever.");
 
-					if (response.substring(0,3).equals("200")) 
-					{
-						//get message from user and send it to server
-						
-						commandPanelText = "Another player has connected";
-            			directions.setText(commandPanelText);
-           				state = 2;
-           				window.revalidate();
-					}
+	            			directions.setText(commandPanelText);
+	            			window.revalidate();
+						}
 
-					//state = 2; //transition to state 2: chat mode
-					break;
+						break;
 
-				case 2:
-					//Chat mode
-					// if (talk) {
-					// 	System.out.print(clientName);
-					// 	response = clientName + inFromUser.readLine();
-					// 	sendData = response.getBytes();
-					// 	sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, 9876);
-					// 	clientSocket.send(sendPacket);
-					// 	talk = false;
-					// }
+					case 1:
 
-					// else {
-					// 	//receive message from other client
-					// 	receivePacket = new DatagramPacket(receiveData, receiveData.length);
-					// 	clientSocket.receive(receivePacket);
-					// 	response = new String(receivePacket.getData());
-					// 	response = response.trim();
+						// Waiting for notification that the second client is ready
+						receivePacket = new DatagramPacket(receiveData, receiveData.length);
+						clientSocket.receive(receivePacket);
+						response = new String(receivePacket.getData());
+	          			response = response.trim();
 
-					// 	if (response.length()>= 7 && response.toLowerCase().contains("goodbye")) {
-					// 		state = 3; //prepare to exit the while loop
-					// 		System.out.println("goodbye");
-					//   		System.out.println("*** chat has been ended ***");
-					// 		break;
-					// 	}
 
-					// 	else {
-					//  		System.out.println(response);
-					//   		talk = true;
-					// 	}
-     //      			}
-          			break;
+						if (response.substring(0,3).equals("200")) 
+						{
+							//get message from user and send it to server
+							
+							commandPanelText = "Another player has connected";
+	            			directions.setText(commandPanelText);
+	           				state = 2;
+	           				window.revalidate();
+						}
 
-          		default:
-          			break;
+						//state = 2; //transition to state 2: chat mode
+						break;
+
+					case 2:
+	          			break;
+
+	          		default:
+	          			break;
+				}
 			}
+			
+			//close the socket
+			clientSocket.close();
 		}
-		//close the socket
-		clientSocket.close();
+
+		catch(Exception e)
+		{
+			System.out.println("Error: " + e.toString());
+			System.exit(0);
+		}
 	}
 }
