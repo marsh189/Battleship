@@ -153,38 +153,17 @@ class MainFrame extends JFrame
 
 					if(!choosingPanel.btnArr[f][s].isEnabled())
 					{
-						locations.add(secondClicked);
+						//locations.add(secondClicked);
 						numPlaced = 5;
 					}
 				}
 			}
-			// else if(choosingPanel.count == 3)
-			// {
-			// 	choosingPanel.count = 4;
-			// 	//secondClicked = choosingPanel.clickedTag;
-			// 	// if(numPlaced == 4)
-			// 	// {
-			// 	// 	System.out.println(secondClicked);
-			// 	// 	int index = secondClicked.indexOf(",");
-			// 	// 	int f =  Integer.parseInt(secondClicked.substring(0,index));
-			// 	// 	int s = Integer.parseInt(secondClicked.substring(index + 1));
-			// 	// 	choosingPanel.btnArr[f][s].setForeground(Color.GREEN);
-			// 	// 	choosingPanel.btnArr[f][s].setBackground(Color.GREEN);
-			// 	// 	choosingPanel.btnArr[f][s].setEnabled(false);
-			// 	// 	//locations.add(secondClicked);
 
-			// 	// 	if(!choosingPanel.btnArr[f][s].isEnabled())
-			// 	// 	{
-			// 	// 		locations.add(secondClicked);
-			// 	// 		numPlaced = 5;
-			// 	// 	}
-			// 	// }
-			// }
 
-			//System.out.println(choosingPanel.count + "," + numPlaced);
+			System.out.println(choosingPanel.count + "," + numPlaced);
 		}
 		directions.setText("All Ships have been set!");
-
+		System.out.println();
 		for (int x = 0; x < 10; x++) 
 		{
 			for (int y = 0; y < 10; y++) 
