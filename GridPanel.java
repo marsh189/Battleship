@@ -4,7 +4,9 @@ import java.awt.event.*;
 
 class GridPanel extends JPanel
 {
-	public JButton[][] btnArr = new JButton[10][10];
+	public MyButton[][] btnArr = new MyButton[10][10];
+	public int count = 0;
+	public String clickedTag;
 
 	//Makes Grid of 100 buttons in a JPanels
 	public GridPanel(int x, int y)
@@ -20,25 +22,12 @@ class GridPanel extends JPanel
 			for (int j = 0; j < 10; j++) 
 			{
 				MyButton btn = new MyButton(i + "," + j);
+				btn.Tag = i + "," + j;
+				btn.myGrid = this;
 				btn.setVisible(true);	
 				btnArr[i][j] = btn;
-				btn.addActionListener(new ActionListener()
-                {
-                    public void actionPerformed(ActionEvent ae)
-                    {
-                        MyButton but = (MyButton) ae.getSource();
-                        but.setForeground(Color.GREEN);
-                        but.setBackground(Color.GREEN);
-                       	but.setEnabled(false);
-                    }
-                });
 				this.add(btn);
 			}
 		}
 	}
-
-	// public void paint(Graphics g)
-	// {
-	// 	g.fillRect(0,0,5,5);
-	// }
 }
