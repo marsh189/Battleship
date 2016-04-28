@@ -121,6 +121,7 @@ class MainFrame extends JFrame
 				{
 					directions.setText("Now Choose a Button 1 space away.");
 					firstClicked = choosingPanel.clickedTag;
+					choosingPanel.count = 3;
 				}
 			}
 			else if(choosingPanel.count == 4)
@@ -129,21 +130,58 @@ class MainFrame extends JFrame
 
 				if(numPlaced == 0)
 				{
-					SetAircraft(firstClicked, secondClicked);
+					Ship(firstClicked, secondClicked, 4);
 				}
 				else if(numPlaced == 1)
 				{
-					SetBattleship(firstClicked,secondClicked);
+					Ship(firstClicked,secondClicked, 3);
 				}
-				if(numPlaced == 2 || numPlaced == 3)
+				else if(numPlaced == 2 || numPlaced == 3)
 				{
-					SetThreePiece(firstClicked, secondClicked);
+					Ship(firstClicked, secondClicked, 2);
 				}
 				else if(numPlaced == 4)
 				{
-					SetPatrol(firstClicked,secondClicked);
+					System.out.println(secondClicked);
+					int index = secondClicked.indexOf(",");
+					int f =  Integer.parseInt(secondClicked.substring(0,index));
+					int s = Integer.parseInt(secondClicked.substring(index + 1));
+					choosingPanel.btnArr[f][s].setForeground(Color.GREEN);
+					choosingPanel.btnArr[f][s].setBackground(Color.GREEN);
+					choosingPanel.btnArr[f][s].setEnabled(false);
+					//locations.add(secondClicked);
+
+					if(!choosingPanel.btnArr[f][s].isEnabled())
+					{
+						locations.add(secondClicked);
+						numPlaced = 5;
+					}
 				}
 			}
+			// else if(choosingPanel.count == 3)
+			// {
+			// 	choosingPanel.count = 4;
+			// 	//secondClicked = choosingPanel.clickedTag;
+			// 	// if(numPlaced == 4)
+			// 	// {
+			// 	// 	System.out.println(secondClicked);
+			// 	// 	int index = secondClicked.indexOf(",");
+			// 	// 	int f =  Integer.parseInt(secondClicked.substring(0,index));
+			// 	// 	int s = Integer.parseInt(secondClicked.substring(index + 1));
+			// 	// 	choosingPanel.btnArr[f][s].setForeground(Color.GREEN);
+			// 	// 	choosingPanel.btnArr[f][s].setBackground(Color.GREEN);
+			// 	// 	choosingPanel.btnArr[f][s].setEnabled(false);
+			// 	// 	//locations.add(secondClicked);
+
+			// 	// 	if(!choosingPanel.btnArr[f][s].isEnabled())
+			// 	// 	{
+			// 	// 		locations.add(secondClicked);
+			// 	// 		numPlaced = 5;
+			// 	// 	}
+			// 	// }
+			// }
+
+			//System.out.println(choosingPanel.count + "," + numPlaced);
 		}
 		directions.setText("All Ships have been set!");
 
@@ -154,18 +192,15 @@ class MainFrame extends JFrame
 				if(!choosingPanel.btnArr[x][y].isEnabled())
 				{
 					locations.add(choosingPanel.btnArr[x][y].Tag);
+					System.out.println(choosingPanel.btnArr[x][y].Tag);
 				}
-				else
-				{
-					choosingPanel.btnArr[x][y].setEnabled(false);
-				}
+				//choosingPanel.btnArr[x][y].setEnabled(false);
 			}	
 		}
 	}
 
-	public static void SetAircraft(String f, String s)
+	public static void Ship(String f, String s, int dif)
 	{
-
 		int index = f.indexOf(",");
 		int firstNum_firstClicked = Integer.parseInt(f.substring(0,index));
 		int firstNum_secondClicked = Integer.parseInt(s.substring(0,index));
@@ -178,7 +213,7 @@ class MainFrame extends JFrame
 		{
 			if(secondNum_firstClicked > secondNum_secondClicked)
 			{
-				if(secondNum_firstClicked - secondNum_secondClicked == 4)
+				if(secondNum_firstClicked - secondNum_secondClicked == dif)
 				{
 					for(int num = secondNum_secondClicked + 1; num <= secondNum_firstClicked; num++)
 					{
@@ -186,7 +221,6 @@ class MainFrame extends JFrame
 						btn.setForeground(Color.GREEN);
 						btn.setBackground(Color.GREEN);
 						btn.setEnabled(false);
-						locations.add(choosingPanel.btnArr[firstNum_firstClicked][num].Tag);
 					}
 					numPlaced++;
 					choosingPanel.count = 0;
@@ -194,7 +228,7 @@ class MainFrame extends JFrame
 			}
 			else if(secondNum_secondClicked > secondNum_firstClicked)
 			{
-				if(secondNum_secondClicked - secondNum_firstClicked == 4)
+				if(secondNum_secondClicked - secondNum_firstClicked == dif)
 				{
 					for(int num = secondNum_firstClicked + 1; num <= secondNum_secondClicked; num++)
 					{
@@ -214,7 +248,7 @@ class MainFrame extends JFrame
 		{
 			if(firstNum_firstClicked > firstNum_secondClicked)
 			{
-				if(firstNum_firstClicked - firstNum_secondClicked == 4)
+				if(firstNum_firstClicked - firstNum_secondClicked == dif)
 				{
 					for(int num = firstNum_secondClicked + 1; num <= firstNum_firstClicked; num++)
 					{
@@ -229,247 +263,7 @@ class MainFrame extends JFrame
 			}
 			else if(firstNum_secondClicked > firstNum_firstClicked)
 			{
-				if(firstNum_secondClicked - firstNum_firstClicked == 4)
-				{
-					for(int num = firstNum_firstClicked + 1; num <= firstNum_secondClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[num][secondNum_firstClicked];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-		}
-	}
-
-	public static void SetBattleship(String f, String s)
-	{
-		int index = f.indexOf(",");
-		int firstNum_firstClicked = Integer.parseInt(f.substring(0,index));
-		int firstNum_secondClicked = Integer.parseInt(s.substring(0,index));
-
-		int secondNum_firstClicked = Integer.parseInt(f.substring(index + 1));
-		int secondNum_secondClicked = Integer.parseInt(s.substring(index + 1));
-
-		//check if buttons are horizontal to each other
-		if(firstNum_firstClicked == firstNum_secondClicked)
-		{
-			if(secondNum_firstClicked > secondNum_secondClicked)
-			{
-				if(secondNum_firstClicked - secondNum_secondClicked == 3)
-				{
-					for(int num = secondNum_secondClicked + 1; num <= secondNum_firstClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[firstNum_firstClicked][num];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-			else if(secondNum_secondClicked > secondNum_firstClicked)
-			{
-				if(secondNum_secondClicked - secondNum_firstClicked == 3)
-				{
-					for(int num = secondNum_firstClicked + 1; num <= secondNum_secondClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[firstNum_firstClicked][num];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-		}
-		
-		//check if buttons are vertical to each other
-		else if(secondNum_firstClicked == secondNum_secondClicked)
-		{
-			if(firstNum_firstClicked > firstNum_secondClicked)
-			{
-				if(firstNum_firstClicked - firstNum_secondClicked == 3)
-				{
-					for(int num = firstNum_secondClicked + 1; num <= firstNum_firstClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[num][secondNum_firstClicked];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-			else if(firstNum_secondClicked > firstNum_firstClicked)
-			{
-				if(firstNum_secondClicked - firstNum_firstClicked == 3)
-				{
-					for(int num = firstNum_firstClicked + 1; num <= firstNum_secondClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[num][secondNum_firstClicked];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-		}
-	}
-
-	public static void SetThreePiece(String f, String s)
-	{
-		int index = f.indexOf(",");
-		int firstNum_firstClicked = Integer.parseInt(f.substring(0,index));
-		int firstNum_secondClicked = Integer.parseInt(s.substring(0,index));
-
-		int secondNum_firstClicked = Integer.parseInt(f.substring(index + 1));
-		int secondNum_secondClicked = Integer.parseInt(s.substring(index + 1));
-
-		//check if buttons are horizontal to each other
-		if(firstNum_firstClicked == firstNum_secondClicked)
-		{
-			if(secondNum_firstClicked > secondNum_secondClicked)
-			{
-				if(secondNum_firstClicked - secondNum_secondClicked == 2)
-				{
-					for(int num = secondNum_secondClicked + 1; num <= secondNum_firstClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[firstNum_firstClicked][num];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-			else if(secondNum_secondClicked > secondNum_firstClicked)
-			{
-				if(secondNum_secondClicked - secondNum_firstClicked == 2)
-				{
-					for(int num = secondNum_firstClicked + 1; num <= secondNum_secondClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[firstNum_firstClicked][num];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-		}
-
-		//check if buttons are vertical to each other
-		else if(secondNum_firstClicked == secondNum_secondClicked)
-		{
-			if(firstNum_firstClicked > firstNum_secondClicked)
-			{
-				if(firstNum_firstClicked - firstNum_secondClicked == 2)
-				{
-					for(int num = firstNum_secondClicked + 1; num <= firstNum_firstClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[num][secondNum_firstClicked];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-			else if(firstNum_secondClicked > firstNum_firstClicked)
-			{
-				if(firstNum_secondClicked - firstNum_firstClicked == 2)
-				{
-					for(int num = firstNum_firstClicked + 1; num <= firstNum_secondClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[num][secondNum_firstClicked];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-		}
-	}
-
-	public static void SetPatrol(String f, String s)
-	{
-		int index = f.indexOf(",");
-		int firstNum_firstClicked = Integer.parseInt(f.substring(0,index));
-		int firstNum_secondClicked = Integer.parseInt(s.substring(0,index));
-
-		int secondNum_firstClicked = Integer.parseInt(f.substring(index + 1));
-		int secondNum_secondClicked = Integer.parseInt(s.substring(index + 1));
-
-		//check if buttons are horizontal to each other
-		if(firstNum_firstClicked == firstNum_secondClicked)
-		{
-			if(secondNum_firstClicked > secondNum_secondClicked)
-			{
-				if(secondNum_firstClicked - secondNum_secondClicked == 1)
-				{
-					for(int num = secondNum_secondClicked + 1; num <= secondNum_firstClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[firstNum_firstClicked][num];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-			else if(secondNum_secondClicked > secondNum_firstClicked)
-			{
-				if(secondNum_secondClicked - secondNum_firstClicked == 1)
-				{
-					for(int num = secondNum_firstClicked + 1; num <= secondNum_secondClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[firstNum_firstClicked][num];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-		}
-
-		//check if buttons are vertical to each other
-		else if(secondNum_firstClicked == secondNum_secondClicked)
-		{
-			if(firstNum_firstClicked > firstNum_secondClicked)
-			{
-				if(firstNum_firstClicked - firstNum_secondClicked == 1)
-				{
-					for(int num = firstNum_secondClicked + 1; num <= firstNum_firstClicked; num++)
-					{
-						MyButton btn = choosingPanel.btnArr[num][secondNum_firstClicked];
-						btn.setForeground(Color.GREEN);
-						btn.setBackground(Color.GREEN);
-						btn.setEnabled(false);
-					}
-					numPlaced++;
-					choosingPanel.count = 0;
-				}
-			}
-			else if(firstNum_secondClicked > firstNum_firstClicked)
-			{
-				if(firstNum_secondClicked - firstNum_firstClicked == 1)
+				if(firstNum_secondClicked - firstNum_firstClicked == dif)
 				{
 					for(int num = firstNum_firstClicked + 1; num <= firstNum_secondClicked; num++)
 					{
