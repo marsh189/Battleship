@@ -160,7 +160,7 @@ class MainFrame extends JFrame
 			}
 
 
-			System.out.println(choosingPanel.count + "," + numPlaced);
+			//System.out.println(choosingPanel.count + "," + numPlaced);
 		}
 		directions.setText("All Ships have been set!");
 		System.out.println();
@@ -173,7 +173,7 @@ class MainFrame extends JFrame
 					locations.add(choosingPanel.btnArr[x][y].Tag);
 					System.out.println(choosingPanel.btnArr[x][y].Tag);
 				}
-				//choosingPanel.btnArr[x][y].setEnabled(false);
+				choosingPanel.btnArr[x][y].setEnabled(false);
 			}	
 		}
 	}
