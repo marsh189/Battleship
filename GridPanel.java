@@ -1,3 +1,11 @@
+/* GridPanel.java
+*
+*  A extension of JPanel
+*  When a GridPanel object is made, a grid of 100 buttons will be made
+*
+*  Editor: Matt Marshall
+*/
+
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;

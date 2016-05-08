@@ -1,3 +1,11 @@
+/* MainFrame.java
+*
+*  This class acts as the main window of the game.
+*  It first sets up the look of the board and gets user to add ships.
+*  This class also will connect the player to the server and play the game.
+*  
+*   Editors: Matt Marshall, Austin Ayers, Julien Fournell
+*/
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
@@ -19,6 +27,13 @@ class MainFrame extends JFrame
 	static ArrayList<String> locations = new ArrayList<String>();	//Will store the locations of ships
 	static int numPlaced = 0;					//How many pieces have been placed
 
+	static DatagramSocket clientSocket;
+	static InetAddress IPAddress;
+	static byte[] sendData = new byte[1024];
+	static byte[] receiveData = new byte[1024];
+
+	public static boolean myTurn = false;
+
 	final static JPanel titlePanel = new JPanel();	//title of Game is stored here		
 
 	public MainFrame()
@@ -35,7 +50,7 @@ class MainFrame extends JFrame
 		ConnectToServer();
 	}
 
-	//Sets up the beginning look of the board
+	//Sets up the beginning look of the board (implemented by Matt)
 	public static void SetupBoard()
 	{
 		window = new MainFrame();
@@ -75,7 +90,7 @@ class MainFrame extends JFrame
 		window.setVisible(true);
 	}
 
-	//Player will place their ship pieces on board
+	//Player will place their ship pieces on board (implemented by Matt)
 	public static void PlaceShips()
 	{
 
@@ -149,21 +164,20 @@ class MainFrame extends JFrame
 					choosingPanel.btnArr[f][s].setForeground(Color.GREEN);
 					choosingPanel.btnArr[f][s].setBackground(Color.GREEN);
 					choosingPanel.btnArr[f][s].setEnabled(false);
-					//locations.add(secondClicked);
+					
 
 					if(!choosingPanel.btnArr[f][s].isEnabled())
 					{
-						//locations.add(secondClicked);
+						
 						numPlaced = 5;
 					}
 				}
 			}
 
-
-			//System.out.println(choosingPanel.count + "," + numPlaced);
+			System.out.println(choosingPanel.count + "," + numPlaced);  //Will not work correctly without this
 		}
 		directions.setText("All Ships have been set!");
-		System.out.println();
+
 		for (int x = 0; x < 10; x++) 
 		{
 			for (int y = 0; y < 10; y++) 
@@ -178,6 +192,7 @@ class MainFrame extends JFrame
 		}
 	}
 
+	//Will make the areas between the two button clicks green (implemented by Matt)
 	public static void Ship(String f, String s, int dif)
 	{
 		int index = f.indexOf(",");
@@ -258,7 +273,7 @@ class MainFrame extends JFrame
 		}
 	}
 
-	//Connects the client to the server
+	//Connects the client to the server (implemented by Austin)
 	public static void ConnectToServer()
 	{
 		try
@@ -268,15 +283,13 @@ class MainFrame extends JFrame
 			int state = 0;
 			String response="";
 
-			DatagramSocket clientSocket = new DatagramSocket();
-	 		InetAddress IPAddress = InetAddress.getByName("localhost");
+			IPAddress = InetAddress.getByName("localhost");
+			clientSocket = new DatagramSocket();
 
 	 		String message = "HELLO SERVER";
-	 		byte[] sendData = new byte[1024];
 	 		sendData = message.getBytes();
 			DatagramPacket sendPacket=null;
 
-	 		byte[] receiveData = new byte[1024];
 			DatagramPacket receivePacket = null;
 			String receivedMessge;
 
@@ -340,6 +353,7 @@ class MainFrame extends JFrame
 							commandPanelText = "Another player has connected";
 	            			directions.setText(commandPanelText);
 	           				state = 2;
+	           				myTurn = true;
 	           				window.revalidate();
 						}
 
@@ -347,6 +361,7 @@ class MainFrame extends JFrame
 						break;
 
 					case 2:
+						PlayGame();
 	          			break;
 
 	          		default:
@@ -365,4 +380,144 @@ class MainFrame extends JFrame
 		}
 	}
 
+	//look for button press and see if it is correct
+	public static void PlayGame() throws Exception
+	{
+		boolean gameOver = false;
+		boolean check = false;
+
+		String message = "";
+ 		sendData = message.getBytes();
+		DatagramPacket sendPacket=null;
+
+
+		DatagramPacket receivePacket = null;
+		String receivedMessge;
+
+		while(!gameOver)
+		{
+			sendData = new byte[1024];
+			receiveData = new byte[1024];
+
+			if(myTurn)
+			{
+				for (int x = 0; x < 10; x++) 
+				{
+					for (int y = 0; y < 10; y++) 
+					{
+						attackPanel.btnArr[x][y].setEnabled(true);	
+						attackPanel.btnArr[x][y].addActionListener(new OnClick());	
+					}	
+				}
+
+				while(attackPanel.count == 0)
+				{
+					directions.setText("Select an area to attack on the top board.");
+				}
+
+				if(attackPanel.count > 0)
+				{
+					for (int x = 0; x < 10; x++) 
+					{
+						for (int y = 0; y < 10; y++) 
+						{
+							attackPanel.btnArr[x][y].setEnabled(false);	
+						}	
+					}
+					message = attackPanel.clickedTag;
+					sendData = message.getBytes();
+					sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,9876);
+					clientSocket.send(sendPacket);
+					check = true;
+					String response = "";
+
+					while(check)
+					{
+						response = ReceiveMessage();
+						System.out.println(response);
+
+						if(Integer.parseInt(response) == 1)
+						{
+							//hit
+							int index = attackPanel.clickedTag.indexOf(",");
+							int first = Integer.parseInt(attackPanel.clickedTag.substring(0,index));
+							int second = Integer.parseInt(attackPanel.clickedTag.substring(index + 1));
+							attackPanel.btnArr[first][second].setForeground(Color.RED);
+							attackPanel.btnArr[first][second].setBackground(Color.RED);
+							check = false;
+						}
+						else if(Integer.parseInt(response) == 0)
+						{
+							//miss
+							int index = attackPanel.clickedTag.indexOf(",");
+							int first = Integer.parseInt(attackPanel.clickedTag.substring(0,index));
+							int second = Integer.parseInt(attackPanel.clickedTag.substring(index + 1));
+							attackPanel.btnArr[first][second].setForeground(new Color(128,128,128));
+							attackPanel.btnArr[first][second].setBackground(new Color(128,128,128));
+							check = false;
+						}
+					}
+					myTurn = false;
+					attackPanel.count = 0;
+					attackPanel.clickedTag = null;
+					response = null;
+				}
+			}
+
+			else
+			{
+				directions.setText("Waiting on other Player");
+				check = true;
+				while(check)
+				{
+					String r = ReceiveMessage();
+					System.out.println(r);
+					boolean hit = false;
+					for (int i = 0; i < locations.size(); i++) 
+					{
+						if(r.equals(locations.get(i)))
+						{
+							hit = true;
+							break;
+						}
+						else
+						{
+							hit = false;
+						}
+					}
+					if(hit)
+					{
+						//hit
+						int index = r.indexOf(",");
+						int first = Integer.parseInt(r.substring(0,index));
+						int second = Integer.parseInt(r.substring(index + 1));
+						choosingPanel.btnArr[first][second].setForeground(Color.RED);
+						choosingPanel.btnArr[first][second].setBackground(Color.RED);
+						check = false;
+					}
+					else
+					{
+						//miss
+						int index = r.indexOf(",");
+						int first = Integer.parseInt(r.substring(0,index));
+						int second = Integer.parseInt(r.substring(index + 1));
+						choosingPanel.btnArr[first][second].setForeground(new Color(128,128,128));
+						choosingPanel.btnArr[first][second].setBackground(new Color(128,128,128));
+						check = false;
+					}
+				}
+				myTurn = true;
+			}
+		}
+	}
+
+	public static String ReceiveMessage() throws Exception
+	{
+		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
+		clientSocket.receive(receivePacket);
+		String receivedSentece = new String(receivePacket.getData());
+		String returnStr = receivedSentece.trim();
+		return returnStr;
+	}
 }

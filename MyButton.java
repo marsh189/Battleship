@@ -1,3 +1,11 @@
+/* MyButton.java
+*
+*  Extension of JButton
+*  Makes a button and sets its color to the respectable color.
+*
+*  Editor: Matt Marshall
+*/
+
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;

@@ -1,3 +1,13 @@
+/* BattleshipServer.java
+*  
+*  This class acts as the server for the game
+*  It will collect an arraylist from each player on where their ships are located.
+*  Then, it will check if the player's guess is in the arraylist.
+*  It will send its results back to the clients.
+*
+*  Editors: Julien Fournell, Austin Ayers
+*/
+
 import java.io.*;
 import java.net.*;
 
@@ -19,7 +29,8 @@ class BattleshipServer
     	String response = "";
 
     	int state = 0;
-
+        boolean firstClientTurn = true;
+        
     	byte[] receiveData = new byte[1024];
     	byte[] sendData  = new byte[1024];
     	byte[] messageBytes = new byte[1024];
@@ -85,36 +96,85 @@ class BattleshipServer
     				break;
 
     			case 2: // Send messages to and from the clients
-    				// receivePacket = new DatagramPacket(receiveData, receiveData.length);
-    				// serverSocket.receive(receivePacket);
-    				// message = new String(receivePacket.getData());
-    				// message = message.trim();
-    				// System.out.println(message);
 
-    				// // Check to see if either client sent "Goodbye"
-    				// if (message.toUpperCase().contains("GOODBYE"))
-    				// {
-    				// 	state = 3;
-    				// 	break;
-    				// }
-    				// IPAddress = receivePacket.getAddress();
-    				// port = receivePacket.getPort();
+                    String r1 = "";
+                    String r2 = "";
 
-        //     		sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
-        //     		sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
+    				receivePacket = new DatagramPacket(receiveData, receiveData.length);
+    				serverSocket.receive(receivePacket);
+    				message = new String(receivePacket.getData());
+    				message = message.trim();
+                    System.out.println(firstClientTurn);
+    				System.out.println(message);
 
-    				// if ((port==port1)&&(IPAddress.equals(IPAddress1)))
-    				// {
-        //      			sendData = receivePacket.getData();
-      		// 			sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
-      		// 			serverSocket.send(sendPacket2);
-    				// }
-    				// else
-    				// {
-        //       			sendData = receivePacket.getData();
-      		// 			sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
-      		// 			serverSocket.send(sendPacket1);
-    				// }
+    				// Check to see if either client sent "Goodbye"
+    				if (message.toUpperCase().contains("GOODBYE"))
+    				{
+    					state = 3;
+    					break;
+    				}
+    				IPAddress = receivePacket.getAddress();
+    				port = receivePacket.getPort();
+
+                    if(message.equals("3,7"))
+                    {
+                        if(firstClientTurn)
+                        {
+                            r1 = "1";
+                            sendData = r1.getBytes();
+                            sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
+
+                            r2 = message;
+                            sendData = r2.getBytes();
+                            sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
+                            serverSocket.send(sendPacket1);
+                            serverSocket.send(sendPacket2);
+                            firstClientTurn = false;
+                        }
+                        else
+                        {
+                            r1 = message;
+                            sendData = r1.getBytes();
+                            sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
+
+                            r2 = "1";
+                            sendData = r2.getBytes();
+                            sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
+                            serverSocket.send(sendPacket1);
+                            serverSocket.send(sendPacket2);
+                            firstClientTurn = true;
+                        }
+                    }
+                    else
+                    {
+                        if(firstClientTurn)
+                        {
+                            r1 = "0";
+                            sendData = r1.getBytes();
+                            sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
+
+                            r2 = message;
+                            sendData = r2.getBytes();
+                            sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
+                            serverSocket.send(sendPacket1);
+                            serverSocket.send(sendPacket2);
+                            firstClientTurn = false;
+                        }
+                        else
+                        {
+                            r1 = message;
+                            sendData = r1.getBytes();
+                            sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
+
+                            r2 = "0";
+                            sendData = r2.getBytes();
+                            sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
+                            serverSocket.send(sendPacket1);
+                            serverSocket.send(sendPacket2);
+                            firstClientTurn = true;
+                        }
+                    }
+        
     				break;
     				
     			default:
