@@ -23,7 +23,7 @@ class MainFrame extends JFrame
 	static GridPanel attackPanel = new GridPanel(10,10); //makes grid to choose where to attack
 	static GridPanel choosingPanel = new GridPanel(10,10); //makes grid to place ships
 	static JLabel directions;					//Tells what the player must do/ What is going on
-	static String commandPanelText;	
+	static String commandPanelText;
 	static ArrayList<String> locations = new ArrayList<String>();	//Will store the locations of ships
 	static int numPlaced = 0;					//How many pieces have been placed
 
@@ -75,9 +75,9 @@ class MainFrame extends JFrame
 			for (int j = 0; j < 10; j++) 
 			{
 					attackPanel.btnArr[i][j].setEnabled(false); //Sets buttons on Top board to unclickable
-			}	
+			}
 		}
-	
+
 		bottomBoard.add(choosingPanel);
 
 		//Puts Grid Panels into One Panel
@@ -99,7 +99,7 @@ class MainFrame extends JFrame
 			for (int y = 0; y < 10; y++) 
 			{
 				choosingPanel.btnArr[x][y].addActionListener(new OnClick());
-			}	
+			}
 		}
 
 		String firstClicked = null;
@@ -164,11 +164,11 @@ class MainFrame extends JFrame
 					choosingPanel.btnArr[f][s].setForeground(Color.GREEN);
 					choosingPanel.btnArr[f][s].setBackground(Color.GREEN);
 					choosingPanel.btnArr[f][s].setEnabled(false);
-					
+
 
 					if(!choosingPanel.btnArr[f][s].isEnabled())
 					{
-						
+
 						numPlaced = 5;
 					}
 				}
@@ -188,7 +188,7 @@ class MainFrame extends JFrame
 					System.out.println(choosingPanel.btnArr[x][y].Tag);
 				}
 				choosingPanel.btnArr[x][y].setEnabled(false);
-			}	
+			}
 		}
 	}
 
@@ -287,6 +287,10 @@ class MainFrame extends JFrame
 			clientSocket = new DatagramSocket();
 
 	 		String message = "HELLO SERVER";
+            for(String m : locations){
+                message += "*";
+                message += m;
+            }
 	 		sendData = message.getBytes();
 			DatagramPacket sendPacket=null;
 
@@ -304,7 +308,7 @@ class MainFrame extends JFrame
 						sendData = message.getBytes();
 						sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,9876);
 						clientSocket.send(sendPacket);
-						
+
 
 
 						receivePacket = new DatagramPacket(receiveData, receiveData.length);
@@ -324,10 +328,10 @@ class MainFrame extends JFrame
 	            			window.revalidate();
 						}
 
-						else if (response.substring(0,3).equals("200")) 
+						else if (response.substring(0,3).equals("200"))
 						{
 							state = 2; //you are second client. Wait for message from first client
-							
+
 							commandPanelText = "Welcome Second Player";
 							System.out.println("You were the second to connect to the sever.");
 
@@ -346,10 +350,10 @@ class MainFrame extends JFrame
 	          			response = response.trim();
 
 
-						if (response.substring(0,3).equals("200")) 
+						if (response.substring(0,3).equals("200"))
 						{
 							//get message from user and send it to server
-							
+
 							commandPanelText = "Another player has connected";
 	            			directions.setText(commandPanelText);
 	           				state = 2;
@@ -368,7 +372,7 @@ class MainFrame extends JFrame
 	          			break;
 				}
 			}
-			
+
 			//close the socket
 			clientSocket.close();
 		}
@@ -401,13 +405,13 @@ class MainFrame extends JFrame
 
 			if(myTurn)
 			{
-				for (int x = 0; x < 10; x++) 
+				for (int x = 0; x < 10; x++)
 				{
-					for (int y = 0; y < 10; y++) 
+					for (int y = 0; y < 10; y++)
 					{
-						attackPanel.btnArr[x][y].setEnabled(true);	
-						attackPanel.btnArr[x][y].addActionListener(new OnClick());	
-					}	
+						attackPanel.btnArr[x][y].setEnabled(true);
+						attackPanel.btnArr[x][y].addActionListener(new OnClick());
+					}
 				}
 
 				while(attackPanel.count == 0)
@@ -417,12 +421,12 @@ class MainFrame extends JFrame
 
 				if(attackPanel.count > 0)
 				{
-					for (int x = 0; x < 10; x++) 
+					for (int x = 0; x < 10; x++)
 					{
-						for (int y = 0; y < 10; y++) 
+						for (int y = 0; y < 10; y++)
 						{
-							attackPanel.btnArr[x][y].setEnabled(false);	
-						}	
+							attackPanel.btnArr[x][y].setEnabled(false);
+						}
 					}
 					message = attackPanel.clickedTag;
 					sendData = message.getBytes();

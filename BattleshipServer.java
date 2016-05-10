@@ -28,9 +28,12 @@ class BattleshipServer
     	String message = "";
     	String response = "";
 
+        ArrayList<String> playerBoard1 = new ArrayList<String>();
+        ArrayList<String> playerBoard2 = new ArrayList<String>();
+
     	int state = 0;
         boolean firstClientTurn = true;
-        
+
     	byte[] receiveData = new byte[1024];
     	byte[] sendData  = new byte[1024];
     	byte[] messageBytes = new byte[1024];
@@ -62,8 +65,13 @@ class BattleshipServer
     				serverSocket.receive(receivePacket);
     				message = new String(receivePacket.getData());
     				message = message.trim();
-    				if (message.equals("HELLO SERVER"))
+    				if (message.contains("HELLO SERVER"))
     				{
+                        message.split("*");
+                        message.remove(0);
+                        for(String s : message){
+                            playerBoard1.add(s);
+                        }
     					System.out.println(message);
     					response = "100";
     					sendData = response.getBytes();
@@ -80,8 +88,13 @@ class BattleshipServer
     				serverSocket.receive(receivePacket);
     				message = new String(receivePacket.getData());
     				message = message.trim();
-    				if (message.equals("HELLO SERVER"))
+    				if (message.contains("HELLO SERVER"))
     				{
+                        message.split("*");
+                        message.remove(0);
+                        for(String s : message){
+                            playerBoard2.add(s);
+                        }
     					System.out.println(message);
     					response = "200";
     					sendData = response.getBytes();
@@ -110,7 +123,7 @@ class BattleshipServer
     				// Check to see if either client sent "Goodbye"
     				if (message.toUpperCase().contains("GOODBYE"))
     				{
-    					state = 3;
+    					state = 4;
     					break;
     				}
     				IPAddress = receivePacket.getAddress();
@@ -174,9 +187,8 @@ class BattleshipServer
                             firstClientTurn = true;
                         }
                     }
-        
+
     				break;
-    				
     			default:
     				break;
     		}
