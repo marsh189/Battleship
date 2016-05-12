@@ -287,10 +287,7 @@ class MainFrame extends JFrame
 			clientSocket = new DatagramSocket();
 
 	 		String message = "HELLO SERVER";
-            for(String m : locations){
-                message += "*";
-                message += m;
-            }
+
 	 		sendData = message.getBytes();
 			DatagramPacket sendPacket=null;
 
@@ -305,12 +302,20 @@ class MainFrame extends JFrame
 				{
 					case 0:
 						// send initial message to server and wait for response
+
+						boolean sendArr = true;
 						sendData = message.getBytes();
 						sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,9876);
 						clientSocket.send(sendPacket);
 
-
-
+						for (int x = 0; x < locations.size(); x++) 
+						{
+							message = locations.get(x);
+							sendData = message.getBytes();
+							sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress,9876);
+							clientSocket.send(sendPacket);
+						}
+						
 						receivePacket = new DatagramPacket(receiveData, receiveData.length);
 						clientSocket.receive(receivePacket);
 						response = new String(receivePacket.getData());
@@ -334,6 +339,7 @@ class MainFrame extends JFrame
 
 							commandPanelText = "Welcome Second Player";
 							System.out.println("You were the second to connect to the sever.");
+							System.out.println("Game Has Started");
 
 	            			directions.setText(commandPanelText);
 	            			window.revalidate();
@@ -355,6 +361,7 @@ class MainFrame extends JFrame
 							//get message from user and send it to server
 
 							commandPanelText = "Another player has connected";
+							System.out.println("Game Has Started");
 	            			directions.setText(commandPanelText);
 	           				state = 2;
 	           				myTurn = true;
@@ -438,7 +445,6 @@ class MainFrame extends JFrame
 					while(check)
 					{
 						response = ReceiveMessage();
-						System.out.println(response);
 
 						if(Integer.parseInt(response) == 1)
 						{
@@ -475,7 +481,6 @@ class MainFrame extends JFrame
 				while(check)
 				{
 					String r = ReceiveMessage();
-					System.out.println(r);
 					boolean hit = false;
 					for (int i = 0; i < locations.size(); i++) 
 					{

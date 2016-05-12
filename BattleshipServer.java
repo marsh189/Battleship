@@ -10,6 +10,7 @@
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 class BattleshipServer
 {
@@ -60,19 +61,31 @@ class BattleshipServer
     		switch(state)
     		{
     			case 0: // Wait for the first connection
-    				System.out.println(state);
     				receivePacket = new DatagramPacket(receiveData, receiveData.length);
     				serverSocket.receive(receivePacket);
     				message = new String(receivePacket.getData());
     				message = message.trim();
     				if (message.contains("HELLO SERVER"))
     				{
-                        message.split("*");
-                        message.remove(0);
-                        for(String s : message){
-                            playerBoard1.add(s);
+
+                        boolean getData = true;
+                        while(getData)
+                        {
+                            if(playerBoard1.size() < 17)
+                            {
+                                receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                                serverSocket.receive(receivePacket);
+                                message = new String(receivePacket.getData());
+                                message = message.trim();
+                                playerBoard1.add(message.substring(0,message.indexOf("L"))); 
+                            }
+                            else
+                            {
+                                getData = false;
+                            }  
                         }
-    					System.out.println(message);
+    					
+                        System.out.println("Connection 1");
     					response = "100";
     					sendData = response.getBytes();
     					IPAddress1 = receivePacket.getAddress();
@@ -90,12 +103,24 @@ class BattleshipServer
     				message = message.trim();
     				if (message.contains("HELLO SERVER"))
     				{
-                        message.split("*");
-                        message.remove(0);
-                        for(String s : message){
-                            playerBoard2.add(s);
+                        boolean getData = true;
+                        while(getData)
+                        {
+                            if(playerBoard2.size() < 17)
+                            {
+                                receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                                serverSocket.receive(receivePacket);
+                                message = new String(receivePacket.getData());
+                                message = message.trim();
+                                playerBoard2.add(message.substring(0,message.indexOf("L"))); 
+                            }
+                            else
+                            {
+                                getData = false;
+                            }  
                         }
-    					System.out.println(message);
+
+                        System.out.println("Connection 2");
     					response = "200";
     					sendData = response.getBytes();
     					IPAddress2 = receivePacket.getAddress();
@@ -110,6 +135,17 @@ class BattleshipServer
 
     			case 2: // Send messages to and from the clients
 
+                    // String arr1 = "";
+                    // String arr2 = "";
+                    // for (int a = 0; a < playerBoard1.size(); a++) 
+                    // {
+                    //         arr1 += (playerBoard1.get(a) + " . ");
+                    //         arr2 += (playerBoard2.get(a) + " . ");
+                    // }
+
+                    // System.out.println(arr1);
+                    // System.out.println(arr2);
+
                     String r1 = "";
                     String r2 = "";
 
@@ -117,75 +153,60 @@ class BattleshipServer
     				serverSocket.receive(receivePacket);
     				message = new String(receivePacket.getData());
     				message = message.trim();
-                    System.out.println(firstClientTurn);
-    				System.out.println(message);
 
     				// Check to see if either client sent "Goodbye"
-    				if (message.toUpperCase().contains("GOODBYE"))
-    				{
-    					state = 4;
-    					break;
-    				}
+    				// if (message.toUpperCase().contains("GOODBYE"))
+    				// {
+    				// 	state = 3;
+    				// 	break;
+    				// }
+
     				IPAddress = receivePacket.getAddress();
     				port = receivePacket.getPort();
 
-                    if(message.equals("3,7"))
+                    if(firstClientTurn)
                     {
-                        if(firstClientTurn)
+                        if(playerBoard2.indexOf(message) > -1)
                         {
                             r1 = "1";
                             sendData = r1.getBytes();
                             sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
-
-                            r2 = message;
-                            sendData = r2.getBytes();
-                            sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
-                            serverSocket.send(sendPacket1);
-                            serverSocket.send(sendPacket2);
-                            firstClientTurn = false;
                         }
                         else
-                        {
-                            r1 = message;
-                            sendData = r1.getBytes();
-                            sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
-
-                            r2 = "1";
-                            sendData = r2.getBytes();
-                            sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
-                            serverSocket.send(sendPacket1);
-                            serverSocket.send(sendPacket2);
-                            firstClientTurn = true;
-                        }
-                    }
-                    else
-                    {
-                        if(firstClientTurn)
                         {
                             r1 = "0";
                             sendData = r1.getBytes();
                             sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
+                        }
 
-                            r2 = message;
+                        r2 = message;
+                        sendData = r2.getBytes();
+                        sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
+                        serverSocket.send(sendPacket1);
+                        serverSocket.send(sendPacket2);
+                        firstClientTurn = false;
+                    }
+                    else
+                    {
+                        if(playerBoard1.indexOf(message) > -1)
+                        {
+                            r2 = "1";
                             sendData = r2.getBytes();
                             sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
-                            serverSocket.send(sendPacket1);
-                            serverSocket.send(sendPacket2);
-                            firstClientTurn = false;
                         }
                         else
                         {
-                            r1 = message;
-                            sendData = r1.getBytes();
-                            sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
-
                             r2 = "0";
                             sendData = r2.getBytes();
                             sendPacket2 = new DatagramPacket(sendData, sendData.length, IPAddress2, port2);
-                            serverSocket.send(sendPacket1);
-                            serverSocket.send(sendPacket2);
-                            firstClientTurn = true;
                         }
+                        
+                        r1 = message;
+                        sendData = r1.getBytes();
+                        sendPacket1 = new DatagramPacket(sendData, sendData.length, IPAddress1, port1);
+                        serverSocket.send(sendPacket1);
+                        serverSocket.send(sendPacket2);
+                        firstClientTurn = true;
                     }
 
     				break;
