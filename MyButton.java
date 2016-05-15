@@ -43,6 +43,10 @@ class MyButton extends JButton {
             {
                 myGrid.clickedTag = this.Tag;
             }
+            else if(myGrid.count == 1)
+            {
+                myGrid.clickedTag = this.Tag;
+            }
             
         }
         else if (getModel().isRollover())

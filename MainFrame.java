@@ -445,7 +445,6 @@ class MainFrame extends JFrame
 					while(check)
 					{
 						response = ReceiveMessage();
-
 						if(Integer.parseInt(response) == 1)
 						{
 							//hit
