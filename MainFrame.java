@@ -15,6 +15,7 @@ import java.util.*;
 
 class MainFrame extends JFrame
 {
+	public static String ipName = "localhost";
 	static JFrame window;
 	static JPanel mainPanel = new JPanel();	//Puts Grid Panels into One Panel
 	static JPanel topBoard = new JPanel();		//Stores top grid in a square
@@ -33,7 +34,6 @@ class MainFrame extends JFrame
 	static byte[] receiveData = new byte[1024];
 
 	public static boolean myTurn = false;
-
 	final static JPanel titlePanel = new JPanel();	//title of Game is stored here		
 
 	public MainFrame()
@@ -283,7 +283,7 @@ class MainFrame extends JFrame
 			int state = 0;
 			String response="";
 
-			IPAddress = InetAddress.getByName("localhost");
+			IPAddress = InetAddress.getByName(ipName);
 			clientSocket = new DatagramSocket();
 
 	 		String message = "HELLO SERVER";
