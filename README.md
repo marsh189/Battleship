@@ -14,3 +14,9 @@ First and foremost, we would like to express how well-scoped the project we chos
 
 ##  Note:
 When placing your ships, make sure you select your second location exactly as far away from the first one as it says to. The program will not run correctly if this is not done correctly. If the prompt in the command panel does not change to the next direction, close the client and start it again. Also, The program DOES NOT check for diagonally placed ships or ships going through other ships. If you accidentally click a wrong button, again, close the client and start it again. 
+
+## Game Images
+![battleship](https://github.com/marsh189/Battleship/assets/11845697/ea61d0a9-1e3b-47a5-a38e-152a42d9ffdf)
+![client](https://github.com/marsh189/Battleship/assets/11845697/aeb8d3e2-1efe-4e99-9568-0a936d4cc786)
+![playedGame](https://github.com/marsh189/Battleship/assets/11845697/84149fc6-cbed-4c06-a18b-1ea1317804b8)
+![playerTurn](https://github.com/marsh189/Battleship/assets/11845697/f3a9bc31-6f03-4789-8336-e49370639fbd)
